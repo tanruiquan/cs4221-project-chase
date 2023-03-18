@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 import xml.etree.ElementTree as ET
-from classes.Relation import Relation
-from classes.Query import Query, Task
+from classes.relation import Relation
+from classes.query import Query, Task
 
 ALPHA = -1  # distinguished variable symbol
 
