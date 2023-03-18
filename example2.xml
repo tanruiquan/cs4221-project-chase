@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF=8"?>
-<!-- Problem statement for entialment of multivalued dependency; Entailed -->
+<!-- Problem statement for entailment of multivalued dependency; Entailed -->
 <chase>
     <table name="R">
         <attribute>A</attribute>
