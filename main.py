@@ -1,15 +1,15 @@
 from argparse import ArgumentParser
 import xml.etree.ElementTree as ET
-from classes.relation import Relation
-from classes.query import Query, Task
+from classes.Relation import Relation
+from classes.Query import Query, Task
 
 ALPHA = -1  # distinguished variable symbol
 
 
 def main(relation, query):
-    # attrOrder is a list of attributes in the order as it appears in the table
+    # attrOrder is a dict of attributes to index, in the order it appears in the table
     attrOrder, table = setUpInitTable(relation, query)
-    while not satisfyRequirement():
+    while not satisfyRequirement(table, query, attrOrder):
         data, changed = step(
             tableData, functionalDependencies, multiValuedDependencies)
         if not changed:
@@ -20,7 +20,10 @@ def main(relation, query):
 # unique to each chase type
 def setUpInitTable(relation, query):
     # convert the initTable to the tableData format
-    attrOrder = list(relation.attributes)
+    attrOrder = {}
+    for idx, val in enumerate(relation.attributes):
+        attrOrder[val] = idx
+    attrOrderList = sorted(attrOrder.items(), key=lambda x: x[1])
     table = []
 
     task = query.task
@@ -28,21 +31,22 @@ def setUpInitTable(relation, query):
         table = [[],[]]
         lhs = query.to_check[0][0]
         table[0] = [ALPHA for attr in attrOrder]
-        table[1] = [ALPHA if attr in lhs else attr + str(1) for attr in attrOrder]
+        table[1] = [ALPHA if attr in lhs else attr + str(1) for attr,idx in attrOrderList]
 
     elif task == Task.MULTIVALUED_DEPENDENCY:
         table = [[],[]]
         lhs = query.to_check[0][0]
         rhs = query.to_check[0][1]
-        table[0] = [ALPHA if (attr in lhs or attr in rhs) else attr + str(0) for attr in attrOrder]
-        table[1] = [ALPHA if (attr in lhs or attr in set(attrOrder).difference(set(rhs))) else attr + str(1) for attr in attrOrder]
+        table[0] = [ALPHA if (attr in lhs or attr in rhs) else attr + str(0) for attr,idx in attrOrderList]
+        table[1] = [ALPHA if (attr in lhs or attr in set(attrOrder).difference(set(rhs))) \
+                        else attr + str(1) for attr,idx in attrOrderList]
 
     elif task == Task.LOSSLESS_JOIN:
         n = len(query.to_check)  # number of subtables
         table = [[] for i in range(0, n)]
         for i in range(0, n):
             schema = query.to_check[i].attributes
-            table[i] = [ALPHA if (attr in schema) else attr + str(i) for attr in attrOrder]
+            table[i] = [ALPHA if (attr in schema) else attr + str(i) for attr,idx in attrOrderList]
 
     return (attrOrder, table)
 
@@ -61,8 +65,29 @@ def step(tableData, functionalDependencies, multiValuedDependencies):
 
 
 # unique to each chase type
-def satisfyRequirement():
+def satisfyRequirement(table, query, attrOrder):
     # if alr valid, return True
+    task = query.task
+    if task == Task.FUNCTIONAL_DEPENDENCY: 
+        rhs = query.to_check[0][1]
+        for attr in rhs:
+            for row in table:
+                if row[attrOrder[attr]] != ALPHA:
+                    return False
+        return True
+
+    elif task == Task.MULTIVALUED_DEPENDENCY:
+        for row in table:
+            if len(list(filter(lambda x: x != ALPHA, row))) == 0:
+                return True
+        return False
+
+    elif task == Task.LOSSLESS_JOIN:
+        for row in table:
+            if len(list(filter(lambda x: x != ALPHA, row))) == 0:
+                return True
+        return False
+    
     return False
 
 
