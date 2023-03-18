@@ -38,7 +38,7 @@ def setUpInitTable(relation, query):
         lhs = query.to_check[0][0]
         rhs = query.to_check[0][1]
         table[0] = [ALPHA if (attr in lhs or attr in rhs) else attr + str(0) for attr,idx in attrOrderList]
-        table[1] = [ALPHA if (attr in lhs or attr in set(attrOrder).difference(set(rhs))) \
+        table[1] = [ALPHA if (attr in lhs or attr in set(attrOrder.keys()).difference(set(rhs))) \
                         else attr + str(1) for attr,idx in attrOrderList]
 
     elif task == Task.LOSSLESS_JOIN:
