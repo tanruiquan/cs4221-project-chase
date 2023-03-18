@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 import xml.etree.ElementTree as ET
-from classes.Relation import Relation
-from classes.Query import Query, Task
+from classes.relation import Relation
+from classes.query import Query, Task
 
 def main(relation, query):
     table = setUpInitTable(input)
@@ -39,7 +39,7 @@ def satisfyRequirement():
 
 def parse_input(input_file):
     """Takes in a xml file and returns 2 objects: `Relation` and `Query`
-    which represents the relational table and task that we are chaing
+    which represents the relational table and task that we are chasing
     respectively."""
 
     tree = ET.parse(input_file)
