@@ -47,7 +47,7 @@ def parse_input(input_file):
     relation = Relation()
     for child in root.find("table"):
         if child.tag == "attribute":
-            relation.add_attritbute(child.text)
+            relation.add_attribute(child.text)
         else:
             lhs = child.find("lhs")
             lhs = [attr.text for attr in lhs.findall("attribute")]

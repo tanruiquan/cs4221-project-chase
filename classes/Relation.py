@@ -4,7 +4,7 @@ class Relation():
         self.functional_dependencies = functional_dependencies
         self.multivalued_dependencies = multivalued_dependencies
 
-    def add_attritbute(self, attr):
+    def add_attribute(self, attr):
         self.attributes.add(attr)
 
     def add_functional_dependency(self, lhs, rhs):
