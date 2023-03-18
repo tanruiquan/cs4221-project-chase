@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF=8"?>
+<!-- Problem statement for entialment of functional dependency; Not entailed -->
+<chase>
+    <table name="R">
+        <attribute>A</attribute>
+        <attribute>B</attribute>
+        <attribute>C</attribute>
+        <attribute>D</attribute>
+        <multivalued_dependency>
+            <lhs>
+                <attribute>A</attribute>
+            </lhs>
+            <rhs>
+                <attribute>B</attribute>
+                <attribute>C</attribute>
+            </rhs>
+        </multivalued_dependency>
+        <functional_dependency>
+            <lhs>
+                <attribute>C</attribute>
+                <attribute>D</attribute>
+            </lhs>
+            <rhs>
+                <attribute>B</attribute>
+            </rhs>
+        </functional_dependency>
+    </table>
+    <dependency_check>
+        <functional_dependency>
+            <lhs>
+                <attribute>A</attribute>
+            </lhs>
+            <rhs>
+                <attribute>B</attribute>
+            </rhs>
+        </functional_dependency>
+    </dependency_check>
+</chase>

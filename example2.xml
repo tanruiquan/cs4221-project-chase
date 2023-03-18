@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF=8"?>
+<!-- Problem statement for entialment of multivalued dependency; Entailed -->
+<chase>
+    <table name="R">
+        <attribute>A</attribute>
+        <attribute>B</attribute>
+        <attribute>C</attribute>
+        <attribute>D</attribute>
+        <multivalued_dependency>
+            <lhs>
+                <attribute>A</attribute>
+            </lhs>
+            <rhs>
+                <attribute>B</attribute>
+            </rhs>
+        </multivalued_dependency>
+        <multivalued_dependency>
+            <lhs>
+                <attribute>B</attribute>
+            </lhs>
+            <rhs>
+                <attribute>C</attribute>
+            </rhs>
+        </multivalued_dependency>
+    </table>
+    <dependency_check>
+        <multivalued_dependency>
+            <lhs>
+                <attribute>A</attribute>
+            </lhs>
+            <rhs>
+                <attribute>C</attribute>
+            </rhs>
+        </multivalued_dependency>
+    </dependency_check>
+</chase>
