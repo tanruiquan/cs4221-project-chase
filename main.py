@@ -1,11 +1,15 @@
+from argparse import ArgumentParser
+import xml.etree.ElementTree as ET
+
 def main():
-    table = setUpInitTable(input)
-    while not satisfyRequirement():
-        data, changed = step(
-            tableData, functionalDependencies, multiValuedDependencies)
-        if not changed:
-            return False
-    return True
+    print("Hello")
+    # table = setUpInitTable(input)
+    # while not satisfyRequirement():
+    #     data, changed = step(
+    #         tableData, functionalDependencies, multiValuedDependencies)
+    #     if not changed:
+    #         return False
+    # return True
 
 
 # unique to each chase type
@@ -31,3 +35,17 @@ def step(tableData, functionalDependencies, multiValuedDependencies):
 def satisfyRequirement():
     # if alr valid, return True
     return False
+
+if __name__ == '__main__':
+    parser = ArgumentParser(
+        description="Apply the chase algorithm to a xml format of a problem statement"
+    )
+    parser.add_argument("input")
+    parser.add_argument("-o", "--output", default="output.xml")
+    args = parser.parse_args()
+
+    tree = ET.parse("test.xml")
+    root = tree.getroot()
+    print(root)
+
+    # main()

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF=8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- Problem statement for entailment of functional dependency; Not entailed -->
 <chase>
     <table name="R">
