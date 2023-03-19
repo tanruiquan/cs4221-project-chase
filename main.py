@@ -78,13 +78,13 @@ def satisfyRequirement(table, query, attrOrder):
 
     elif task == Task.MULTIVALUED_DEPENDENCY:
         for row in table:
-            if len(list(filter(lambda x: x != ALPHA, row))) == 0:
+            if all(attr == ALPHA for attr in row):
                 return True
         return False
 
     elif task == Task.LOSSLESS_JOIN:
         for row in table:
-            if len(list(filter(lambda x: x != ALPHA, row))) == 0:
+            if all(attr == ALPHA for attr in row):
                 return True
         return False
     
