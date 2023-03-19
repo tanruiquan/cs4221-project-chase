@@ -1,10 +1,8 @@
-def chaseMvds(table: list[list[str]], mvds: list[list[list[str]]]):
-    attr_col = {}
-    isUpdated = False
+from typing import Dict
 
-    for i in range(len(table[0])): # mapping of attr to index
-        attr_col[table[0][i]] = i
-    mapToIndex(mvds, attr_col)
+def chaseMvds(table: list[list[str]], mvds: list[list[list[str]]], schema: Dict[str, int]):
+    isUpdated = False
+    mvds = mapToIndex(mvds, schema)
 
     for mvd in mvds:
         lhs_col = mvd[0] 
@@ -12,7 +10,7 @@ def chaseMvds(table: list[list[str]], mvds: list[list[list[str]]]):
         lhs_to_rhs = {}
         generated = [] # list of rows generated
 
-        for row in table[1:]:
+        for row in table:
             lhs = tuple(row[i] for i in lhs_col)
             rhs = tuple(row[i] for i in rhs_col)
             if lhs not in lhs_to_rhs:
@@ -21,7 +19,7 @@ def chaseMvds(table: list[list[str]], mvds: list[list[list[str]]]):
             else : 
                 lhs_to_rhs[lhs].add(rhs)
 
-        for row in table[1:]:
+        for row in table:
             curr_rhs = tuple(row[i] for i in rhs_col)
             all_rhs = lhs_to_rhs[tuple(row[i] for i in lhs_col)]
             for rhs in all_rhs:
@@ -43,19 +41,20 @@ def chaseMvds(table: list[list[str]], mvds: list[list[list[str]]]):
     return (table, isUpdated)
 
 def mapToIndex(mvds: list[list[list[str]]], attr_col: dict):
+    mvds_idx = []
     for mvd in mvds: 
         lhs_col = list(map(lambda x: attr_col[x], mvd[0]))
         rhs_col = list(map(lambda x: attr_col[x], mvd[1]))
-        mvd[0] = lhs_col
-        mvd[1] = rhs_col
+        mvds_idx.append([lhs_col, rhs_col])
+    return mvds_idx
 
 def main():
-    table = [['A', 'B', 'C', 'D'],
-            ['a1', 'b1', 'c1', 'd1'], 
+    schema = {'A': 0, 'B': 1, 'C': 2, 'D': 3}
+    table = [['a1', 'b1', 'c1', 'd1'], 
             ['a1', 'b2', 'c2', 'd2']]
-    
     mvds = [[['A'], ['B']], [['B'], ['C']]]
-    res = chaseMvds(table, mvds)
+
+    res = chaseMvds(table, mvds, schema)
     print(res[0])
 
 if __name__ == '__main__':
