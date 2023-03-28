@@ -36,7 +36,6 @@ def chaseMvds(table: list[list[str]], mvds: list[list[list[str]]], schema: Dict[
         if generated: 
             isUpdated = True
             table += generated
-            print(table) # print intermediate tables
 
     return (table, isUpdated)
 
