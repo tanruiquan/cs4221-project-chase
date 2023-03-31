@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 from classes.Relation import Relation
-from classes.Query import Query, Task
+from classes.Query import Query
 
 class XMLIO:
     """
@@ -17,6 +17,50 @@ class XMLIO:
         self.input = input
         self.output = output
 
+    def get_relation(self, root):
+        """Returns the `Relation` data structure."""
+
+        # Extract the table name and its attributes
+        table_name = root.find('table').get('name')
+        attributes = [elem.text for elem in root.find('table').findall('attribute')]
+
+        relation = Relation(table_name, attributes)
+
+        for fd in root.findall('table/functional_dependency'):
+            lhs = [elem.text for elem in fd.find("lhs")]
+            rhs = [elem.text for elem in fd.find("rhs")]
+            relation.add_functional_dependency(lhs, rhs)
+        
+        for mvd in root.findall('table/multivalued_dependency'):
+            lhs = [elem.text for elem in mvd.find("lhs")]
+            rhs = [elem.text for elem in mvd.find("rhs")]
+            relation.add_multivalued_dependency(lhs, rhs)
+
+        return relation
+
+    def get_query(self, root):
+        # Extract the dependency check type and tables
+        check_type = root.find('dependency_check').get('type')
+
+        query = Query(check_type)
+
+        for fd in root.findall('dependency_check/functional_dependency'):
+            lhs = [elem.text for elem in fd.find("lhs")]
+            rhs = [elem.text for elem in fd.find("rhs")]
+            query.add_functional_dependency(lhs, rhs)
+        
+        for mvd in root.findall('dependency_check/multivalued_dependency'):
+            lhs = [elem.text for elem in mvd.find("lhs")]
+            rhs = [elem.text for elem in mvd.find("rhs")]
+            query.add_multivalued_dependency(lhs, rhs)
+
+        for table in root.findall('dependency_check/table'):
+            table_name = table.get('name')
+            table_attributes = [elem.text for elem in table.findall('attribute')]
+            query.add_relation(Relation(table_name, table_attributes))
+        
+        return query
+
     def read_xml(self):
         """Reads an xml file and returns 2 objects: `Relation` and `Query`
         which represents the relational table and task that we are chasing
@@ -24,39 +68,11 @@ class XMLIO:
 
         tree = ET.parse(self.input)
         root = tree.getroot()
-        relation = Relation()
-        for child in root.find("table"):
-            if child.tag == "attribute":
-                relation.add_attribute(child.text)
-            else:
-                lhs = child.find("lhs")
-                lhs = [attr.text for attr in lhs.findall("attribute")]
-                rhs = child.find("rhs")
-                rhs = [attr.text for attr in rhs.findall("attribute")]
-                if child.tag == "functional_dependency":
-                    relation.add_functional_dependency(lhs, rhs)
-                elif child.tag == "multivalued_dependency":
-                    relation.add_multivalued_dependency(lhs, rhs)
+        relation = self.get_relation(root)
+        query = self.get_query(root)
+        print(relation)
+        print(query)
 
-        query = Query()
-        for child in root.find("dependency_check"):
-            if child.tag == "functional_dependency":
-                query.set_task(Task.FUNCTIONAL_DEPENDENCY)
-                lhs = child.find("lhs")
-                lhs = [attr.text for attr in lhs.findall("attribute")]
-                rhs = child.find("rhs")
-                rhs = [attr.text for attr in rhs.findall("attribute")]
-                query.add_check([lhs, rhs])
-            elif child.tag == "multivalued_dependency":
-                query.set_task(Task.MULTIVALUED_DEPENDENCY)
-                lhs = child.find("lhs")
-                lhs = [attr.text for attr in lhs.findall("attribute")]
-                rhs = child.find("rhs")
-                rhs = [attr.text for attr in rhs.findall("attribute")]
-                query.add_check([lhs, rhs])
-            elif child.tag == "table":
-                query.set_task(Task.LOSSLESS_JOIN)
-                query.add_check(Relation(set(child.findall("attribute"))))
         return (relation, query)
 
     def get_intermediate_filename(self, step_number):

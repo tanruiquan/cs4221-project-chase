@@ -5,6 +5,8 @@ class Relation():
 
     Attributes
     ----------
+    name : str
+        The name of the relation table.
     attributes : set
         A set of attributes of the relation.
     functional_dependencies : list
@@ -24,10 +26,12 @@ class Relation():
         multivalued dependencies on the relation.
     """
 
-    def __init__(self, attributes=None, functional_dependencies=None, multivalued_dependencies=None):
+    def __init__(self, name, attributes=None, functional_dependencies=None, multivalued_dependencies=None):
         """
         Parameters
         ----------
+        name : str
+            The name of the relation.
         attributes : set, optional
             A set of attributes of the relation (default is empty set).
         functional_dependencies : list, optional
@@ -42,6 +46,7 @@ class Relation():
             functional_dependencies = []
         if multivalued_dependencies is None:
             multivalued_dependencies = []
+        self.name = name
         self.attributes = attributes
         self.functional_dependencies = functional_dependencies
         self.multivalued_dependencies = multivalued_dependencies
@@ -104,8 +109,14 @@ class Relation():
         self.multivalued_dependencies.append(mvd)
 
     def __str__(self):
-        string = "RELATION\n"
+        """String representation of `Relation` for debugging."""
+
+        string = f'Table name: {self.name}\n'
         string += f"Attributes: {self.attributes}\n"
-        string += f"Functional dependencies: {self.functional_dependencies}\n"
-        string += f"Multivalued dependencies: {self.multivalued_dependencies}\n"
+        string += "Functional Dependencies:\n"
+        for lhs, rhs in self.functional_dependencies:
+            string += f'  {lhs} -> {rhs}\n'
+        string += "Multivalued Dependencies\n"
+        for lhs, rhs in self.multivalued_dependencies:
+            string += f'  {lhs} ->> {rhs}\n'
         return string
