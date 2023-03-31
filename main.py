@@ -1,30 +1,39 @@
 from argparse import ArgumentParser
-import xml.etree.ElementTree as ET
 
-from classes.Relation import Relation
-from classes.Query import Query, Task
+from classes.xml_io import XMLIO
+from classes.Query import Task
 from chaseFd import chaseFds
 from chaseMvd import chaseMvds
-from utils.fileutils import write_intermediate_result, write_result
-
 from utils.common import ALPHA
 
-from pprint import pprint
-
-
-def main(relation, query, outputFilename):
+def main():
+    args = parse_arguments()
+    xml_io = XMLIO(args.input, args.output)
+    relation, query = xml_io.read_xml()
     # schema is a dict of attributes to index, in the order it appears in the table
     schema, table = setUpInitTable(relation, query)
     stepNum = 1
+    answer = True
     while not satisfyRequirement(table, query, schema):
-        table, changed = step(table, relation, schema, stepNum, outputFilename)
+        print(f"Current: {stepNum}")
+        xml_io.write_intermediate_result(schema, table, stepNum)
+        table, changed = step(table, relation, schema)
         if not changed:
-            handleFinalOutput(outputFilename, schema, table, False)
-            return False
+            answer = False
+            break
         stepNum += 1
-    handleFinalOutput(outputFilename, schema, table, True)
-    return True
+    xml_io.write_result(schema, table, answer)
 
+def parse_arguments():
+    """Set up the command line arguments and parse it."""
+
+    parser = ArgumentParser(
+    description="Apply the chase algorithm to a xml format of a problem statement"
+    )
+    parser.add_argument("input")
+    parser.add_argument("output", nargs="?", default="output.xml")
+
+    return parser.parse_args()
 
 # unique to each chase type
 def setUpInitTable(relation, query):
@@ -60,41 +69,24 @@ def setUpInitTable(relation, query):
     return (schema, table)
 
 
-def step(table, relation, schema, stepNumber, outputFilename):
+def step(table, relation, schema):
     # loop thru all functional dependencies and multi-valued dependencies
     # if hasUpdate, return (updatedTableData, True)
     # else return (updatedTableDate, False)
     table, hasFdUpdate = chaseFds(table, relation.functional_dependencies, schema)
 
-    table, hasMvdUpdate = chaseMvds(table, relation.multivalued_dependencies, schema);
+    table, hasMvdUpdate = chaseMvds(table, relation.multivalued_dependencies, schema)
 
     hasUpdate = hasFdUpdate or hasMvdUpdate
 
-    if hasUpdate:
-        handleIntermediateOutput(outputFilename, schema, table, stepNumber) 
     return (table, hasUpdate)
-
-
-def handleIntermediateOutput(outputFilename, schema, table, stepNumber):
-    pprint(table)
-    print()
-
-    fileExtension = ".xml"
-    intermediateOutputFilename = ''.join(outputFilename.split(fileExtension)) + f"_intermediate_{stepNumber}" + fileExtension
-    write_intermediate_result(intermediateOutputFilename, schema, table)
-
-
-def handleFinalOutput(outputFilename, schema, table, answer):
-    pprint(table)
-    print()
-    write_result(outputFilename, schema, table, answer)
 
 
 # unique to each chase type
 def satisfyRequirement(table, query, schema):
     # if alr valid, return True
     task = query.task
-    if task == Task.FUNCTIONAL_DEPENDENCY: 
+    if task == Task.FUNCTIONAL_DEPENDENCY:
         rhs = query.to_check[0][1]
         for attr in rhs:
             for row in table:
@@ -113,62 +105,8 @@ def satisfyRequirement(table, query, schema):
             if all(attr == ALPHA for attr in row):
                 return True
         return False
-    
+
     return False
 
-
-def parse_input(input_file):
-    """Takes in a xml file and returns 2 objects: `Relation` and `Query`
-    which represents the relational table and task that we are chasing
-    respectively."""
-
-    tree = ET.parse(input_file)
-    root = tree.getroot()
-    relation = Relation()
-    for child in root.find("table"):
-        if child.tag == "attribute":
-            relation.add_attribute(child.text)
-        else:
-            lhs = child.find("lhs")
-            lhs = [attr.text for attr in lhs.findall("attribute")]
-            rhs = child.find("rhs")
-            rhs = [attr.text for attr in rhs.findall("attribute")]
-            if child.tag == "functional_dependency":
-                relation.add_functional_dependency(lhs, rhs)
-            elif child.tag == "multivalued_dependency":
-                relation.add_multivalued_dependency(lhs, rhs)
-
-    query = Query()
-    for child in root.find("dependency_check"):
-        if child.tag == "functional_dependency":
-            query.set_task(Task.FUNCTIONAL_DEPENDENCY)
-            lhs = child.find("lhs")
-            lhs = [attr.text for attr in lhs.findall("attribute")]
-            rhs = child.find("rhs")
-            rhs = [attr.text for attr in rhs.findall("attribute")]
-            query.add_check([lhs, rhs])
-        elif child.tag == "multivalued_dependency":
-            query.set_task(Task.MULTIVALUED_DEPENDENCY)
-            lhs = child.find("lhs")
-            lhs = [attr.text for attr in lhs.findall("attribute")]
-            rhs = child.find("rhs")
-            rhs = [attr.text for attr in rhs.findall("attribute")]
-            query.add_check([lhs, rhs])
-        elif child.tag == "table":
-            query.set_task(Task.LOSSLESS_JOIN)
-            query.add_check(Relation(set(child.findall("attribute"))))
-    return (relation, query)
-
-
 if __name__ == '__main__':
-    parser = ArgumentParser(
-        description="Apply the chase algorithm to a xml format of a problem statement"
-    )
-    parser.add_argument("input")
-    parser.add_argument("output", nargs="?", default="output.xml")
-    args = parser.parse_args()
-
-    relation, query = parse_input(args.input)
-    print(relation)
-    print(query)
-    main(relation, query, args.output)
+    main()
