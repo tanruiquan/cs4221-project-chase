@@ -1,10 +1,11 @@
 from argparse import ArgumentParser
 
 from classes.xml_io import XMLIO
-from classes.Query import Task
+from classes.Query import Query
 from chaseFd import chaseFds
 from chaseMvd import chaseMvds
-from utils.common import ALPHA
+from utils.common import ALPHA, FUNCTIONAL_DEPENDENCY, LOSSLESS_JOIN, MINIMAL_COVER, MULTIVALUED_DEPENDENCY, DISTINGUISHED, SIMPLE
+
 
 def main():
     args = parse_arguments()
@@ -30,12 +31,12 @@ def parse_arguments():
     parser = ArgumentParser(
     description="Apply the chase algorithm to a xml format of a problem statement"
     )
+    parser.add_argument("chase_type", nargs="?", default=DISTINGUISHED, choices=[SIMPLE, DISTINGUISHED])
     parser.add_argument("input")
     parser.add_argument("output", nargs="?", default="output.xml")
 
     return parser.parse_args()
 
-# unique to each chase type
 def setUpInitTable(relation, query):
     # convert the initTable to the tableData format
     schema = {}
