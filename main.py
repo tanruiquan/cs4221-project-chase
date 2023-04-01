@@ -128,12 +128,13 @@ def step(table, relation, schema):
     table, hasFdUpdate = chaseFds(
         table, relation.functional_dependencies, schema)
 
+    if hasFdUpdate:
+        return (table, hasFdUpdate)
+
     table, hasMvdUpdate = chaseMvds(
         table, relation.multivalued_dependencies, schema)
 
-    hasUpdate = hasFdUpdate or hasMvdUpdate
-
-    return (table, hasUpdate)
+    return (table, hasMvdUpdate)
 
 
 # unique to each chase type
@@ -214,9 +215,6 @@ def simpleEntailment(relation: Relation, query: Query, xml_io: XMLIO | None):
     schema, table = setUpSimpleTable(relation, query)
     stepNum = 1
     while True:
-        # TEMP CHECK
-        if stepNum == 5:
-            break
         if xml_io is not None:
             print(f"Current: {stepNum}")
             xml_io.write_intermediate_result(schema, table, stepNum)
