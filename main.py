@@ -134,12 +134,13 @@ def checkMinimalCover(relation: Relation, query: Query, xml_io: XMLIO | None):
     pos = 0
     if len(fds) == 0:
         return
+    xml_io.write_min_cov(fds)
     while pos < len(fds):
-        # TODO: xml_io.print_fd(fds)
         newQuery = Query(FUNCTIONAL_DEPENDENCY)
         newQuery.add_functional_dependency(fds[pos])
         if not checkEntailment(relation, newQuery):
             fds.pop(pos)
+            xml_io.write_min_cov(fds)
         else:
             pos += 1
 
