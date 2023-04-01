@@ -132,15 +132,21 @@ def checkEntailment(relation: Relation, query: Query, xml_io: XMLIO | None):
 def checkMinimalCover(relation: Relation, query: Query, xml_io: XMLIO | None):
     fds = query.functional_dependencies
     pos = 0
+    step_num = 1
     if len(fds) == 0:
         return
-    xml_io.write_min_cov(fds)
+    xml_io.write_min_cov(fds, 0)
     while pos < len(fds):
         newQuery = Query(FUNCTIONAL_DEPENDENCY)
-        newQuery.add_functional_dependency(fds[pos])
-        if not checkEntailment(relation, newQuery):
+        newQuery.add_functional_dependency(fds[pos][0], fds[pos][1])
+        newRelation = Relation(relation.name, relation.attributes)
+        for i, fd in enumerate(fds):
+            if i != pos:
+                newRelation.add_functional_dependency(fd[0], fd[1])
+        if checkEntailment(newRelation, newQuery, None):
             fds.pop(pos)
-            xml_io.write_min_cov(fds)
+            xml_io.write_min_cov(fds, step_num)
+            step_num += 1
         else:
             pos += 1
 

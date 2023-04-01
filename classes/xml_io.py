@@ -125,7 +125,7 @@ class XMLIO:
         filename = self.get_intermediate_filename(step_number)
         tree.write(filename)
 
-    def write_min_cov(self, fds):
+    def write_min_cov(self, fds, step_number):
         """Writes the minimum cover of a relation to `self.output`.
 
         Parameters
@@ -149,7 +149,8 @@ class XMLIO:
 
         # Write the XML file
         tree = ET.ElementTree(root)
-        tree.write(self.output)
+        filename = 'min_cov_' + str(step_number) + '.xml'
+        tree.write(filename)
 
     def write_result(self, schema, table, answer):
         """Writes the result of the chase algorithm to `self.output`.
