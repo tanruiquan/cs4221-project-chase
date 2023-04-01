@@ -12,16 +12,18 @@ def main():
     args = parse_arguments()
     xml_io = XMLIO(args.input, args.output)
     relation, query = xml_io.read_xml()
-    r, table = setUpSimpleTable(relation, query)
-    print(table)
     # schema is a dict of attributes to index, in the order it appears in the table
-    if True:  # distinguished chase
+    distinguished = False
+    if distinguished:  # distinguished chase
         if query.task != MINIMAL_COVER:
             checkEntailment(relation, query, xml_io)
         else:
             checkMinimalCover(relation, query, xml_io)
     else:  # simple chase
-        schema, table = setUpInitTable(relation, query)
+        if query.task != MINIMAL_COVER:
+            simpleEntailment(relation, query, xml_io)
+        else:
+            simpleMinimalCover(relation, query, xml_io)
 
 
 def parse_arguments():
@@ -161,6 +163,35 @@ def satisfyRequirement(table, query, schema):
     return False
 
 
+def satisfySimpleRequirement(table, query, schema):
+    # if alr valid, return True
+    task = query.task
+    if task == FUNCTIONAL_DEPENDENCY:
+        lhs = query.functional_dependencies[0][0]
+        lshPos = list(map(lambda x: schema[x], lhs))
+        rhs = query.functional_dependencies[0][1]
+        rhsPos = list(map(lambda x: schema[x], rhs))
+        for i in range(0, len(table)):
+            currLhs = list(map(lambda x: table[i][x], lshPos))
+            currRhs = list(map(lambda x: table[i][x], rhsPos))
+            for j in range(i+1, len(table)):
+                checkLhs = list(map(lambda x: table[j][x], lshPos))
+                checkRhs = list(map(lambda x: table[j][x], rhsPos))
+                if checkLhs == currLhs and checkRhs != currRhs:
+                    return False
+        return True
+
+    elif task == MULTIVALUED_DEPENDENCY:
+        # TO UPDATE
+        return False
+
+    elif task == LOSSLESS_JOIN:
+        print('Error: This should not happen!')
+        return False
+
+    return False
+
+
 def checkEntailment(relation: Relation, query: Query, xml_io: XMLIO | None):
     schema, table = setUpInitTable(relation, query)
     stepNum = 1
@@ -179,7 +210,49 @@ def checkEntailment(relation: Relation, query: Query, xml_io: XMLIO | None):
     return answer
 
 
+def simpleEntailment(relation: Relation, query: Query, xml_io: XMLIO | None):
+    schema, table = setUpSimpleTable(relation, query)
+    stepNum = 1
+    while True:
+        # TEMP CHECK
+        if stepNum == 5:
+            break
+        if xml_io is not None:
+            print(f"Current: {stepNum}")
+            xml_io.write_intermediate_result(schema, table, stepNum)
+        table, changed = step(table, relation, schema)
+        if not changed:
+            break
+        stepNum += 1
+    answer = satisfySimpleRequirement(table, query, schema)
+    if xml_io is not None:
+        xml_io.write_result(schema, table, answer)
+    return answer
+
+
 def checkMinimalCover(relation: Relation, query: Query, xml_io: XMLIO | None):
+    fds = query.functional_dependencies
+    pos = 0
+    step_num = 1
+    if len(fds) == 0:
+        return
+    xml_io.write_min_cov(fds, 0)
+    while pos < len(fds):
+        newQuery = Query(FUNCTIONAL_DEPENDENCY)
+        newQuery.add_functional_dependency(fds[pos][0], fds[pos][1])
+        newRelation = Relation(relation.name, relation.attributes)
+        for i, fd in enumerate(fds):
+            if i != pos:
+                newRelation.add_functional_dependency(fd[0], fd[1])
+        if checkEntailment(newRelation, newQuery, None):
+            fds.pop(pos)
+            xml_io.write_min_cov(fds, step_num)
+            step_num += 1
+        else:
+            pos += 1
+
+
+def simpleMinimalCover(relation: Relation, query: Query, xml_io: XMLIO | None):
     fds = query.functional_dependencies
     pos = 0
     step_num = 1
