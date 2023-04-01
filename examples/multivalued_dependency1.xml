@@ -23,7 +23,7 @@
             </rhs>
         </multivalued_dependency>
     </table>
-    <dependency_check>
+    <dependency_check type="multivalued_dependency">
         <multivalued_dependency>
             <lhs>
                 <attribute>A</attribute>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Problem statement for entailment of functional dependency; Entailed -->
+<!-- Problem statement for entailment of functional dependency; Not entailed -->
 <chase>
     <table name="R">
         <attribute>A</attribute>
@@ -17,20 +17,21 @@
         </multivalued_dependency>
         <functional_dependency>
             <lhs>
+                <attribute>C</attribute>
                 <attribute>D</attribute>
             </lhs>
             <rhs>
-                <attribute>C</attribute>
+                <attribute>B</attribute>
             </rhs>
         </functional_dependency>
     </table>
-    <dependency_check>
+    <dependency_check type="functional_dependency">
         <functional_dependency>
             <lhs>
                 <attribute>A</attribute>
             </lhs>
             <rhs>
-                <attribute>C</attribute>
+                <attribute>B</attribute>
             </rhs>
         </functional_dependency>
     </dependency_check>

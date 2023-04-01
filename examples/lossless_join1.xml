@@ -32,7 +32,7 @@
             </rhs>
         </functional_dependency>
     </table>
-    <dependency_check>
+    <dependency_check type="lossless_join">
         <table name="R1">
             <attribute>A</attribute>
             <attribute>D</attribute>

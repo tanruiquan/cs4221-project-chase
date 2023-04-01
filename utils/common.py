@@ -1,1 +1,5 @@
 ALPHA = "-1"
+FUNCTIONAL_DEPENDENCY = "functional_dependency"
+MULTIVALUED_DEPENDENCY = "multivalued_dependency"
+LOSSLESS_JOIN = "lossless_join"
+MINIMAL_COVER = "minimal_cover"
