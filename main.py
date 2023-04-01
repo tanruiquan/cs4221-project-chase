@@ -44,25 +44,25 @@ def setUpInitTable(relation, query):
     task = query.task
     if task == FUNCTIONAL_DEPENDENCY:
         table = [[], []]
-        lhs = query.to_check[0][0]
+        lhs = query.functional_dependencies[0][0]
         table[0] = [ALPHA for attr in schema]
         table[1] = [ALPHA if attr in lhs else attr +
                     str(2) for attr, idx in schemaList]
 
     elif task == MULTIVALUED_DEPENDENCY:
         table = [[], []]
-        lhs = query.to_check[0][0]
-        rhs = query.to_check[0][1]
+        lhs = query.multivalued_dependencies[0][0]
+        rhs = query.multivalued_dependencies[0][1]
         table[0] = [ALPHA if (attr in lhs or attr in rhs)
                     else attr + str(1) for attr, idx in schemaList]
         table[1] = [ALPHA if (attr in lhs or attr in set(schema.keys()).difference(set(rhs)))
                     else attr + str(2) for attr, idx in schemaList]
 
     elif task == LOSSLESS_JOIN:
-        n = len(query.to_check)  # number of subtables
+        n = len(query.relations)  # number of subtables
         table = [[] for i in range(0, n)]
         for i in range(0, n):
-            subschema = query.to_check[i].attributes
+            subschema = query.relations[i].attributes
             table[i] = [ALPHA if (attr in subschema) else attr + str(i+1)
                         for attr, idx in schemaList]
 
@@ -89,7 +89,7 @@ def satisfyRequirement(table, query, schema):
     # if alr valid, return True
     task = query.task
     if task == FUNCTIONAL_DEPENDENCY:
-        rhs = query.to_check[0][1]
+        rhs = query.functional_dependencies[0][1]
         for attr in rhs:
             for row in table:
                 if row[schema[attr]] != ALPHA:
