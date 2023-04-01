@@ -2,6 +2,7 @@ import xml.etree.ElementTree as ET
 from classes.Relation import Relation
 from classes.Query import Query
 
+
 class XMLIO:
     """
     A class used to represent an xml file reader and writer.
@@ -13,6 +14,7 @@ class XMLIO:
     output : str
         A string representing the outpu tfilename or path.
     """
+
     def __init__(self, input, output):
         self.input = input
         self.output = output
@@ -22,7 +24,8 @@ class XMLIO:
 
         # Extract the table name and its attributes
         table_name = root.find('table').get('name')
-        attributes = [elem.text for elem in root.find('table').findall('attribute')]
+        attributes = [elem.text for elem in root.find(
+            'table').findall('attribute')]
 
         relation = Relation(table_name, attributes)
 
@@ -30,7 +33,7 @@ class XMLIO:
             lhs = [elem.text for elem in fd.find("lhs")]
             rhs = [elem.text for elem in fd.find("rhs")]
             relation.add_functional_dependency(lhs, rhs)
-        
+
         for mvd in root.findall('table/multivalued_dependency'):
             lhs = [elem.text for elem in mvd.find("lhs")]
             rhs = [elem.text for elem in mvd.find("rhs")]
@@ -48,7 +51,7 @@ class XMLIO:
             lhs = [elem.text for elem in fd.find("lhs")]
             rhs = [elem.text for elem in fd.find("rhs")]
             query.add_functional_dependency(lhs, rhs)
-        
+
         for mvd in root.findall('dependency_check/multivalued_dependency'):
             lhs = [elem.text for elem in mvd.find("lhs")]
             rhs = [elem.text for elem in mvd.find("rhs")]
@@ -56,9 +59,10 @@ class XMLIO:
 
         for table in root.findall('dependency_check/table'):
             table_name = table.get('name')
-            table_attributes = [elem.text for elem in table.findall('attribute')]
+            table_attributes = [
+                elem.text for elem in table.findall('attribute')]
             query.add_relation(Relation(table_name, table_attributes))
-        
+
         return query
 
     def read_xml(self):
@@ -120,6 +124,32 @@ class XMLIO:
         tree = ET.ElementTree(root)
         filename = self.get_intermediate_filename(step_number)
         tree.write(filename)
+
+    def write_min_cov(self, fds):
+        """Writes the minimum cover of a relation to `self.output`.
+
+        Parameters
+        ----------
+        fds : list[FunctionalDependency]
+            A list of functional dependencies.
+        """
+
+        # Create the root element
+        root = ET.Element('minimum_cover')
+
+        # Create the functional dependency elements
+        for fd in fds:
+            fd_element = ET.SubElement(root, 'functional_dependency')
+            lhs = ET.SubElement(fd_element, 'lhs')
+            for attr in fd[0]:
+                ET.SubElement(lhs, 'attribute').text = attr
+            rhs = ET.SubElement(fd_element, 'rhs')
+            for attr in fd[1]:
+                ET.SubElement(rhs, 'attribute').text = attr
+
+        # Write the XML file
+        tree = ET.ElementTree(root)
+        tree.write(self.output)
 
     def write_result(self, schema, table, answer):
         """Writes the result of the chase algorithm to `self.output`.
