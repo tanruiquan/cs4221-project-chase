@@ -12,11 +12,16 @@ def main():
     args = parse_arguments()
     xml_io = XMLIO(args.input, args.output)
     relation, query = xml_io.read_xml()
+    r, table = setUpSimpleTable(relation, query)
+    print(table)
     # schema is a dict of attributes to index, in the order it appears in the table
-    if query.task != MINIMAL_COVER:
-        checkEntailment(relation, query, xml_io)
-    else:
-        checkMinimalCover(relation, query, xml_io)
+    if True:  # distinguished chase
+        if query.task != MINIMAL_COVER:
+            checkEntailment(relation, query, xml_io)
+        else:
+            checkMinimalCover(relation, query, xml_io)
+    else:  # simple chase
+        schema, table = setUpInitTable(relation, query)
 
 
 def parse_arguments():
@@ -65,6 +70,51 @@ def setUpInitTable(relation, query):
             subschema = query.relations[i].attributes
             table[i] = [ALPHA if (attr in subschema) else attr + str(i+1)
                         for attr, idx in schemaList]
+
+    return (schema, table)
+
+
+def setUpSimpleTable(relation, query):
+    schema = {}
+    for idx, val in enumerate(sorted(relation.attributes)):
+        schema[val] = idx
+    schemaList = sorted(schema.items(), key=lambda x: x[1])
+    table = [1, 2]
+    table = list(map(lambda x: [attr[0] + str(x)
+                 for attr in schemaList], table))
+    task = query.task
+    if task == FUNCTIONAL_DEPENDENCY:
+        lhs = query.functional_dependencies[0][0]
+        lhs_index = list(map(lambda x: schema[x], lhs))
+        for index in lhs_index:
+            table[1][index] = table[0][index]
+
+    elif task == MULTIVALUED_DEPENDENCY:
+        lhs = query.multivalued_dependencies[0][0]
+        lhs_index = list(map(lambda x: schema[x], lhs))
+        for index in lhs_index:
+            table[1][index] = table[0][index]
+
+    elif task == LOSSLESS_JOIN:
+        # only 2 relation for simple chase
+        if len(query.relations) != 2:
+            print("Error: only 2 relations for simple chase")
+            return
+        subschema1 = query.relations[0].attributes
+        subschema2 = query.relations[1].attributes
+        uniqueTo1 = set(subschema1).difference(set(subschema2))
+        uniqueTo2 = set(subschema2).difference(set(subschema1))
+        if len(uniqueTo1) == 0:
+            print("Error: first relation is a proper subset of second relation")
+        if len(uniqueTo2) == 0:
+            print("Error: second relation is a proper subset of first relation")
+        mvdLhs = list(uniqueTo1)
+        mvdRhs = list(uniqueTo2)
+        lhs_index = list(map(lambda x: schema[x], mvdLhs))
+        for index in lhs_index:
+            table[1][index] = table[0][index]
+        query.task = MULTIVALUED_DEPENDENCY
+        query.multivalued_dependencies = [[mvdLhs, mvdRhs]]
 
     return (schema, table)
 
