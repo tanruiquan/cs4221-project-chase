@@ -1,7 +1,9 @@
 from enum import Enum
 
 # functional syntax
-Task = Enum('Task', ['FUNCTIONAL_DEPENDENCY', 'MULTIVALUED_DEPENDENCY', 'LOSSLESS_JOIN'])
+Task = Enum('Task', ['FUNCTIONAL_DEPENDENCY',
+            'MULTIVALUED_DEPENDENCY', 'LOSSLESS_JOIN', 'MINIMAL_COVER'])
+
 
 class Query():
     """
@@ -78,7 +80,7 @@ class Query():
     def add_multivalued_dependency(self, lhs, rhs):
         """Adds a multivalued dependency, lhs ->> rhs, to the list of
         multivalued dependencies.
-        
+
         The multivalued dependencies are are used for entailment and
         minimal cover queries. If the multivalued dependency already
         exists, it will not be added. As a side effect, the lhs and
@@ -101,7 +103,7 @@ class Query():
 
     def add_relation(self, relation):
         """Adds a relation to the list of relations.
-        
+
         The relations are used for lossless join queries.
 
         Parameters
