@@ -12,9 +12,8 @@ def main():
     args = parse_arguments()
     xml_io = XMLIO(args.input, args.output)
     relation, query = xml_io.read_xml()
-    # schema is a dict of attributes to index, in the order it appears in the table
-    distinguished = False
-    if distinguished:  # distinguished chase
+    chase_type = args.chase_type
+    if chase_type == DISTINGUISHED:  # distinguished chase
         if query.task != MINIMAL_COVER:
             checkEntailment(relation, query, xml_io)
         else:
