@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Problem statement for entailment of join dependency; Entailed -->
+<chase>
+    <table name="R">
+        <attribute>A</attribute>
+        <attribute>B</attribute>
+        <attribute>C</attribute>
+        <attribute>D</attribute>
+        <functional_dependency>
+            <lhs>
+                <attribute>A</attribute>
+            </lhs>
+            <rhs>
+                <attribute>B</attribute>
+            </rhs>
+        </functional_dependency>
+        <functional_dependency>
+            <lhs>
+                <attribute>B</attribute>
+            </lhs>
+            <rhs>
+                <attribute>C</attribute>
+            </rhs>
+        </functional_dependency>
+        <functional_dependency>
+            <lhs>
+                <attribute>C</attribute>
+                <attribute>D</attribute>
+            </lhs>
+            <rhs>
+                <attribute>A</attribute>
+            </rhs>
+        </functional_dependency>
+    </table>
+    <dependency_check type="lossless_join">
+        <table name="R1">
+            <attribute>A</attribute>
+            <attribute>D</attribute>
+        </table>
+        <table name="R3">
+            <attribute>B</attribute>
+            <attribute>C</attribute>
+            <attribute>D</attribute>
+        </table>
+    </dependency_check>
+</chase>
