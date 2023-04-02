@@ -183,8 +183,7 @@ def satisfySimpleRequirement(table, query, schema):
         return True
 
     elif task == MULTIVALUED_DEPENDENCY:
-        # TO UPDATE
-        return False
+        return satisfyMvd(table, query.multivalued_dependencies[0], schema)
 
     elif task == LOSSLESS_JOIN:
         print('Error: This should not happen!')
@@ -270,6 +269,27 @@ def simpleMinimalCover(relation: Relation, query: Query, xml_io: XMLIO | None):
             step_num += 1
         else:
             pos += 1
+
+
+def satisfyMvd(table, mvd, schema):
+    lhs = mvd[0]
+    lshPos = list(map(lambda x: schema[x], lhs))
+    rhs = mvd[1]
+    rhsPos = list(map(lambda x: schema[x], rhs))
+    for i in range(0, len(table)):
+        currLhs = list(map(lambda x: table[i][x], lshPos))
+        currRhs = list(map(lambda x: table[i][x], rhsPos))
+        for j in range(0, len(table)):
+            checkLhs = list(map(lambda x: table[j][x], lshPos))
+            checkRhs = list(map(lambda x: table[j][x], rhsPos))
+            if checkLhs == currLhs and checkRhs != currRhs:
+                currRowCopy = table[i].copy()
+                for k in range(0, len(currRowCopy)):
+                    if k not in lshPos and k not in rhsPos:
+                        currRowCopy[k] = table[j][k]
+                if currRowCopy not in table:
+                    return False
+    return True
 
 
 if __name__ == '__main__':
