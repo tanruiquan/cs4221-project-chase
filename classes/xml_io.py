@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+from pathlib import Path
 from classes.Relation import Relation
 from classes.Query import Query
 
@@ -82,10 +83,10 @@ class XMLIO:
     def get_intermediate_filename(self, step_number):
         """Returns a string for an intermediate filename with step number."""
 
-        filename = self.output.split('.')[:-1]
-        file_extension = self.output.split('.')[-1]
-        filename.extend([f"_intermediate_{step_number}.", file_extension])
-        return ''.join(filename)
+        path = Path(self.output)
+        filename = f"{path.stem}_intermediate_{step_number}{path.suffix}"
+        new_path = path.parent / filename
+        return new_path
 
     def write_intermediate_result(self, schema, table, step_number):
         """Writes an intermediate result of the chase algorithm to
@@ -149,7 +150,7 @@ class XMLIO:
 
         # Write the XML file
         tree = ET.ElementTree(root)
-        filename = 'min_cov_' + str(step_number) + '.xml'
+        filename = self.get_intermediate_filename(step_number)
         tree.write(filename)
 
     def write_result(self, schema, table, answer):
