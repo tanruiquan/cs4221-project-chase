@@ -29,11 +29,12 @@ def parse_arguments():
     """Set up the command line arguments and parse it."""
 
     parser = ArgumentParser(
-        description="Apply the chase algorithm to a xml format of a problem statement"
+        description="Apply the Chase algorithm to a xml format of a problem statement\
+            and generate traces in xml format."
     )
-    parser.add_argument("chase_type", nargs="?", default=DISTINGUISHED, choices=[SIMPLE, DISTINGUISHED])
+    parser.add_argument("chase_type", default=DISTINGUISHED, choices=[SIMPLE, DISTINGUISHED])
     parser.add_argument("input")
-    parser.add_argument("output", nargs="?", default="output.xml")
+    parser.add_argument("output", default="output.xml")
 
     return parser.parse_args()
 
