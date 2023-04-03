@@ -196,7 +196,6 @@ def checkEntailment(relation: Relation, query: Query, xml_io: XMLIO | None):
     answer = True
     while not satisfyRequirement(table, query, schema):
         if xml_io is not None:
-            print(f"Current: {stepNum}")
             xml_io.write_intermediate_result(schema, table, stepNum)
         table, changed = step(table, relation, schema)
         if not changed:
@@ -213,7 +212,6 @@ def simpleEntailment(relation: Relation, query: Query, xml_io: XMLIO | None):
     stepNum = 1
     while True:
         if xml_io is not None:
-            print(f"Current: {stepNum}")
             xml_io.write_intermediate_result(schema, table, stepNum)
         table, changed = step(table, relation, schema)
         if not changed:

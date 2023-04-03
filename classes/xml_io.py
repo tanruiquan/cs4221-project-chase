@@ -75,8 +75,6 @@ class XMLIO:
         root = tree.getroot()
         relation = self.get_relation(root)
         query = self.get_query(root)
-        print(relation)
-        print(query)
 
         return (relation, query)
 
