@@ -1,10 +1,3 @@
-from enum import Enum
-
-# functional syntax
-Task = Enum('Task', ['FUNCTIONAL_DEPENDENCY',
-            'MULTIVALUED_DEPENDENCY', 'LOSSLESS_JOIN', 'MINIMAL_COVER'])
-
-
 class Query():
     """
     A class to represent the task the chase algorithm is chasing.
