@@ -1,1 +1,23 @@
-<intermediate_result><table><header><attribute>A</attribute><attribute>B</attribute><attribute>C</attribute><attribute>D</attribute></header><row><value>-1</value><value>B1</value><value>-1</value><value>D1</value></row><row><value>-1</value><value>-1</value><value>C2</value><value>-1</value></row></table><step_number>1</step_number></intermediate_result>
+<intermediate_result>
+  <table>
+    <header>
+      <attribute>A</attribute>
+      <attribute>B</attribute>
+      <attribute>C</attribute>
+      <attribute>D</attribute>
+    </header>
+    <row>
+      <value>-1</value>
+      <value>B1</value>
+      <value>-1</value>
+      <value>D1</value>
+    </row>
+    <row>
+      <value>-1</value>
+      <value>-1</value>
+      <value>C2</value>
+      <value>-1</value>
+    </row>
+  </table>
+  <step_number>1</step_number>
+</intermediate_result>

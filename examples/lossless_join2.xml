@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Problem statement for entailment of join dependency; Entailed -->
+<!-- Problem statement for entailment of join dependency; Not Entailed -->
 <chase>
     <table name="R">
         <attribute>A</attribute>
