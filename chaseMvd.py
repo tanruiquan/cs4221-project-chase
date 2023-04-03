@@ -3,7 +3,6 @@ from typing import Dict
 def chaseMvds(table: list[list[str]], mvds: list[list[list[str]]], schema: Dict[str, int]):
     isUpdated = False
     mvds = mapToIndex(mvds, schema)
-
     for mvd in mvds:
         lhs_col = mvd[0] 
         rhs_col = mvd[1]
@@ -36,6 +35,7 @@ def chaseMvds(table: list[list[str]], mvds: list[list[list[str]]], schema: Dict[
         if generated: 
             isUpdated = True
             table += generated
+            return table, isUpdated
 
     return (table, isUpdated)
 
